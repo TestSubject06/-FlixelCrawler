@@ -18,6 +18,8 @@ package game
 			
 			moveSpeed = 180.0;
 			loadGraphic(ResourceManager.GFX_ENEMY1);
+			width = 30;
+			height = 30;
 		}
 		
 		

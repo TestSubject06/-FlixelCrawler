@@ -69,8 +69,11 @@ package game.states
 			// Add the player(s) to the MGSprites layer.
 			for (var i: int = 0; i < players.length; i++)
 			{
-				lyrMGSprites.add(players[i])
+				lyrMGSprites.add(players[i]);
 			}
+			
+			FlxG.followBounds(0, 0, 1000, 1000);
+			FlxG.follow(players[0], 5); // the Lerp thing is fucking weird.
 		}
 		
 		
