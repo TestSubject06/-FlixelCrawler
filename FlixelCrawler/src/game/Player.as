@@ -9,10 +9,12 @@ package game
 	public class Player extends FlxSprite
 	{
 		public var moveSpeed :Number;
+		public var name :String;
+		public var faceImg :Class;
 		
 		
 		
-		public function Player(X :Number, Y :Number)
+		public function Player(X :Number = 0, Y :Number = 0, Name :String = "GUEST", FaceImage :Class = null)
 		{
 			super(X, Y);
 			
@@ -20,6 +22,9 @@ package game
 			loadGraphic(ResourceManager.GFX_ENEMY1);
 			width = 30;
 			height = 30;
+			name = Name;
+			if (FaceImage == null) faceImg = ResourceManager.GFX_PLAYER_FACE_ICON;
+			else faceImg = FaceImage;
 		}
 		
 		

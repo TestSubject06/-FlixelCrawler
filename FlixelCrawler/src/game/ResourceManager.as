@@ -18,9 +18,12 @@ package game
 		// private static const GFX_DIR :String = ASSETS_DIR + "gfx/";
 		
 		// GFX EMBEDS
-		[Embed(source = "../../assets/gfx/mockRPG.png")] public static const GFX_MOCK_RPG :Class;
+		[Embed(source = "../../assets/gfx/testBG.png")] public static const GFX_TEST_BG :Class;
 		[Embed(source = "../../assets/gfx/enemy.png")] public static const GFX_ENEMY1 :Class;
-		[Embed(source = "../../assets/gfx/Bar.gif")] public static const GFX_HEALTH_BAR :Class;
+		[Embed(source = "../../assets/gfx/hpBar.png")] public static const GFX_PLAYER_HP_BAR :Class;
+		[Embed(source = "../../assets/gfx/HudBack.png")] public static const GFX_PLAYER_HUD_BG :Class;
+		[Embed(source = "../../assets/gfx/mpBarPlaceholder.png")] public static const GFX_PLAYER_MP_BAR :Class;
+		[Embed(source = "../../assets/gfx/WarriorIcon.png")] public static const GFX_PLAYER_FACE_ICON :Class;
 		
 		// SFX EMBEDS
 		[Embed(source = "../../assets/sfx/player_hurt.mp3")] public static const SFX_PLAYER_HURT :Class;

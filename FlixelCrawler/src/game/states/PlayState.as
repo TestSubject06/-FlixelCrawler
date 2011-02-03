@@ -1,5 +1,6 @@
 package game.states
 {
+	import game.PlayerStatusGUI;
 	import org.flixel.FlxPoint;
 	import org.flixel.FlxSprite;
 	import org.flixel.FlxGroup;
@@ -61,10 +62,10 @@ package game.states
 			add(lyrGUI);
 			
 			// Add a backdrop.
-			lyrBackdrop.add(new FlxSprite(0, 0, ResourceManager.GFX_MOCK_RPG));
+			lyrBackdrop.add(new FlxSprite(0, 0, ResourceManager.GFX_TEST_BG));
 			
 			// Initialize players vec w/ one player (us) and three empty players.
-			players = new <Player>[new Player(200, 200), null, null, null];
+			players = new <Player>[new Player(200, 200, "Ace20"), null, null, null];
 			
 			// Add the player(s) to the MGSprites layer.
 			for (var i: int = 0; i < players.length; i++)
@@ -72,9 +73,14 @@ package game.states
 				lyrMGSprites.add(players[i]);
 			}
 			
-			lyrGUI(
+			// Add the GUIs for each player.
+			lyrGUI.add(new PlayerStatusGUI(0, 0, players[0]), true);
+			lyrGUI.add(new PlayerStatusGUI(150, 0, players[1]), true);
+			lyrGUI.add(new PlayerStatusGUI(300, 0, players[2]), true);
+			lyrGUI.add(new PlayerStatusGUI(450, 0, players[3]), true);
 			
-			FlxG.followBounds(0, 0, 1000, 1000);
+			// Set up the camera.
+			FlxG.followBounds(0, 0, (lyrBackdrop.members[0] as FlxSprite).width, (lyrBackdrop.members[0] as FlxSprite).height);
 			FlxG.follow(players[0], 5); // the Lerp thing is fucking weird.
 		}
 		
@@ -82,8 +88,10 @@ package game.states
 		
 		override public function update() :void
 		{
+			// Update totalElapsed.
 			totalElapsed += FlxG.elapsed;
 			
+			// Update every add()'d game object.
 			super.update(); // before totalElapsed update? or after?
 		}
 	}
