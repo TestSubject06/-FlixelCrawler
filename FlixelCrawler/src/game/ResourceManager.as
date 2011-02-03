@@ -20,6 +20,7 @@ package game
 		// GFX EMBEDS
 		[Embed(source = "../../assets/gfx/mockRPG.png")] public static const GFX_MOCK_RPG :Class;
 		[Embed(source = "../../assets/gfx/enemy.png")] public static const GFX_ENEMY1 :Class;
+		[Embed(source = "../../assets/gfx/Bar.gif")] public static const GFX_HEALTH_BAR :Class;
 		
 		// SFX EMBEDS
 		[Embed(source = "../../assets/sfx/player_hurt.mp3")] public static const SFX_PLAYER_HURT :Class;

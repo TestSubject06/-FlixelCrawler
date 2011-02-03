@@ -72,6 +72,8 @@ package game.states
 				lyrMGSprites.add(players[i]);
 			}
 			
+			lyrGUI(
+			
 			FlxG.followBounds(0, 0, 1000, 1000);
 			FlxG.follow(players[0], 5); // the Lerp thing is fucking weird.
 		}
