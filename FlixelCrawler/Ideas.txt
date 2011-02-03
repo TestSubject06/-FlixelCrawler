@@ -1,0 +1,38 @@
+Umm, well i guess this is a good place to put this - and you guys are gonna have to help me fleh this out some.
+
+-----------------
+-----Levels------
+-----------------
+This game is essentially(in my head) looking like Gauntlet + Diablo, or something like that. The idea is randomly generated levels(either by chunks or a per tile random) populated by various dungeon monsters - orcs, spiders, zombies, trolls, the like. The goal of each level is to get everyone to the [stairs, ramp, ladder] down to the next level. Im thinking maybe have a town up above, or just some guy that follows you down and sets up shop at the entrance to each level.
+
+-----------------
+-----Classes-----
+-----------------
+I'm thinking for the start ther should be just 3 basic classes, Warrior - Ranger - Mage (those don't have to be the actual class Names) and maybe add more as we progress through this. Each class will have its own skill tree so that no 2 warriors are perfectly identical - or they dont have to be. Stuff like passives and area of effect nukes.
+
+-----------------
+------Items------
+-----------------
+The item system will be similar to diablo in that items should have prefixes and suffixes that give various bonuses to base items. The inventory should just look like a bunch of empty slots, and items can be dragged and dropped around. Items picked up should immediately enter the first available inventory slot, and draging an item off of the inventory pane should drop the item onto the ground. Not too sure about trading. What do you guys think - straight item drops for trades or have a trade pane?
+
+-----------------
+------Music------
+-----------------
+This games soundtrack should be pretty much ambient unless theres something major happening, like a boss fight, or a team member has died(play a sad theme). Think Diablo2 soundtrack - but chippy. or we might get away with an upbeat track if the game is fast paced enough. Ill leave this up to you guys - though this is probably the last thing we should do that way we capture the mood of the game, once we figure that out.
+
+-----------------
+-----Artwork-----
+-----------------
+The game is supposed to be cartoony, not super anime cartoony, but not ultra grim and detailed like Diablo. Like a kid shouldnt go to newgrounds - log into this game and see pentagrams endlessly burning in stone. Other than that though, i leave the art completely up to you guys - once i finish these damn mockups. :)
+
+-----------------
+---Multiplayer---
+-----------------
+This game is pretty much being made to be played with 4 players in the game. Enemies should scale based on how many players are currently in the room(Maybe +25% all stats per player? or more?). Before players join a game they should be presented with a server browser and a simple chat interface for players to communicate and set set up games. There should also be the ability to make a private game that doesnt appear on the server listing. As i asked above, Trading (yes/no?)
+
+-----------------
+-----Events------
+-----------------
+I think it would be really cool to have some levels be radically different than others. like some levels are 'Crowded' where theres like 200% or more enemy count. or some levels are tagged with 'Big Boss' where theres a very large, multi-sprite enemy somewhere in the dungeon that is going to be Very difficult to take down. you know shit like that. And going with the random level generation design it should be too hard to impliment something like that.
+
+Thats everything I can think of in terms of like Mechanics and stuff. Feel free to add questions either here or the IRC. I'm sure I left something out somewhere.
