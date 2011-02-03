@@ -1,8 +1,10 @@
-package scenes
+package states
 {
+	import org.flixel.FlxSprite;
 	import org.flixel.FlxState;
 	import org.flixel.FlxU;
 	import org.flixel.FlxG;
+	import game.*;
 	
 	
 
@@ -18,7 +20,8 @@ package scenes
 		{
 			totalElapsed = 0.0;
 			
-			/*			
+			// This is how I typically handle layers
+			/*
 			lyrBackground3 = new FlxGroup();
 			lyrBackground3.scrollFactor.x = .25;
 			lyrBackground3.scrollFactor.y = .25;
@@ -45,6 +48,11 @@ package scenes
 			*/
 			
 			//player = new Player(0, 0);
+			
+			// And now for some random hacky stuff to get something to display!
+			FlxG.play(ResourceManager.RANDOM_SONG, 1.0, true); // this song doesn't fit at allLOL
+			add(new FlxSprite(0, 0, ResourceManager.GFX_MOCK_RPG));
+			add(new FlxSprite(FlxG.width / 2, FlxG.height / 2, ResourceManager.GFX_ENEMY1));
 		}
 		
 		

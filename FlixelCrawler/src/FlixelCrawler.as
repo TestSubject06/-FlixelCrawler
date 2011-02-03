@@ -1,9 +1,10 @@
 package 
 {
 	import org.flixel.FlxGame;
+	import states.*;
 
 	// Make the SWF be 800x600
-	[SWF(width = "800", height = "600", backgroundColor = "#000000")]
+	[SWF(width = "640", height = "480", backgroundColor = "#000000")]
 	
 	// Set Preloader class name.
     [Frame(factoryClass="Preloader")]
@@ -18,8 +19,8 @@ package
 			
 			// ResourceManager.initialize();
 			
-			// Make the FlxGame have 800x600 resolution at regular 1x pixel zoom. Start the game in PlayState.
-			super(800, 600, PlayState, 1);
+			// Make the FlxGame have 640x480 resolution at regular 1x pixel zoom. Start the game in PlayState.
+			super(640, 480, PlayState, 1);
         }
     }
 }
