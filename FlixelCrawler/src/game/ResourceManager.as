@@ -26,7 +26,7 @@ package game
 		
 		// BGM EMBEDS
 		//[Embed(source = "../../assets/bgm/no_music.mp3")] public static const BGM_NO_MUSIC :Class;
-		[Embed(source = "../../assets/bgm/beep_boop.mp3")] public static const RANDOM_SONG :Class;
+		//[Embed(source = "../../assets/bgm/beep_boop.mp3")] public static const RANDOM_SONG :Class;
 		
 		// MAP EMBEDS
 		

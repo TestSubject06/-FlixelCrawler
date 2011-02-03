@@ -1,10 +1,10 @@
-package states
+package game.states
 {
 	import org.flixel.FlxSprite;
 	import org.flixel.FlxState;
 	import org.flixel.FlxU;
 	import org.flixel.FlxG;
-	import game.*;
+	import game.ResourceManager; // HEY IS THERE A WAY TO GET RID OF THIS LINE
 	
 	
 
@@ -15,7 +15,7 @@ package states
 
 
 		
-		
+		// How do you doc functions again
 		override public function create() : void
 		{
 			totalElapsed = 0.0;
@@ -50,7 +50,7 @@ package states
 			//player = new Player(0, 0);
 			
 			// And now for some random hacky stuff to get something to display!
-			FlxG.play(ResourceManager.RANDOM_SONG, 1.0, true); // this song doesn't fit at allLOL
+			// FlxG.play(ResourceManager.RANDOM_SONG, 1.0, true);
 			add(new FlxSprite(0, 0, ResourceManager.GFX_MOCK_RPG));
 			add(new FlxSprite(FlxG.width / 2, FlxG.height / 2, ResourceManager.GFX_ENEMY1));
 		}
@@ -59,8 +59,9 @@ package states
 		
 		override public function update() :void
 		{
-			super.update(); // before? or after?
 			totalElapsed += FlxG.elapsed;
+			
+			super.update(); // before totalElapsed update? or after?
 		}
 	}
 }

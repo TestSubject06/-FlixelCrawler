@@ -1,7 +1,7 @@
 package 
 {
 	import org.flixel.FlxGame;
-	import states.*;
+	import game.states.*;
 
 	// Make the SWF be 800x600
 	[SWF(width = "640", height = "480", backgroundColor = "#000000")]
