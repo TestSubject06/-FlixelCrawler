@@ -1,0 +1,1 @@
+Yeah RIGHT! Readme!?! how about a god damn readme for this whole GIT THING?!?! HUH?!? WHY NOT!
