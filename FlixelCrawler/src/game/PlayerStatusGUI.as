@@ -41,7 +41,7 @@ package game
 				var framesArray :Array = [];
 				while (framesArray.length < 48) // 48 is number of frames in hp bar anim
 					framesArray[framesArray.length] = framesArray.length;
-				hpBar.addAnimation("idle", framesArray, 30);
+				hpBar.addAnimation("idle", framesArray, 15);
 				hpBar.play("idle");
 				mpBar = new FlxSprite(hpBar.x, hpBar.y + hpBar.height + 2, ResourceManager.GFX_PLAYER_MP_BAR);
 				
