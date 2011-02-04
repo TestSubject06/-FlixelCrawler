@@ -3,6 +3,7 @@ package game
 	import org.flixel.data.FlxGamepad;
 	import org.flixel.FlxG;
 	import org.flixel.FlxSprite;
+	import game.states.PlayState;
 
 
 	
@@ -10,6 +11,8 @@ package game
 	// the other players whose games you are conected to!
 	public class Player extends FlxSprite
 	{
+		//Default to player 0
+		public var playerIndex:uint = 0;
 		public var moveSpeed :Number;
 		public var name :String;
 		public var faceImg :Class;
@@ -44,14 +47,27 @@ package game
 		
 		override protected function updateMotion() :void
 		{
-			if ((FlxG.gamepads[0] as FlxGamepad).pressed("LEFT")) velocity.x = -moveSpeed;
-			else if ((FlxG.gamepads[0] as FlxGamepad).pressed("RIGHT")) velocity.x = moveSpeed;
+			var firstx:Number = x;
+			var firsty:Number = y;
+			//Check the keys against your 'virtual controller' that we set up earlier.
+			if ((FlxG.gamepads[playerIndex] as FlxGamepad).pressed("LEFT")) velocity.x = -moveSpeed;
+			else if ((FlxG.gamepads[playerIndex] as FlxGamepad).pressed("RIGHT")) velocity.x = moveSpeed;
 			else velocity.x = 0;
-			if ((FlxG.gamepads[0] as FlxGamepad).pressed("UP")) velocity.y = -moveSpeed;
-			else if ((FlxG.gamepads[0] as FlxGamepad).pressed("DOWN")) velocity.y = moveSpeed;
+			if ((FlxG.gamepads[playerIndex] as FlxGamepad).pressed("UP")) velocity.y = -moveSpeed;
+			else if ((FlxG.gamepads[playerIndex] as FlxGamepad).pressed("DOWN")) velocity.y = moveSpeed;
 			else velocity.y = 0;
 			
 			super.updateMotion();
+			
+			//If the player has moved, send that shit!
+			if (firstx != x || firsty != y) {
+				PlayState(FlxG.state).connection.send("move", x, y, velocity.x, velocity.y);
+			}
+		}
+		
+		// ... I don't even know. But it looks cool to takeControl of a sprite :D
+		public function takeControl(playerIndex:uint):void {
+			this.playerIndex = playerIndex;
 		}
 	}
 }
