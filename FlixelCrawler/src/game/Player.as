@@ -6,6 +6,8 @@ package game
 
 
 	
+	// This class represents a player in the game. You can only control one by yourself, but others exist to represent 
+	// the other players whose games you are conected to!
 	public class Player extends FlxSprite
 	{
 		public var moveSpeed :Number;

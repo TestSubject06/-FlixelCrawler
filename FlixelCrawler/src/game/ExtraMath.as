@@ -5,6 +5,7 @@
 	
 	
 	
+	// The ExtraMath class contains some convenience function for working with vectors!
 	public class ExtraMath
 	{
 		
