@@ -1,0 +1,9 @@
+floor 16
+left_wall 10
+top_wall 14
+right_wall 12
+bottom_wall 22
+ul_corner 4
+ur_corner 7
+bl_corner 19
+br_corner 1

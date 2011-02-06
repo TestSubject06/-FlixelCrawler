@@ -27,7 +27,8 @@ package game
 		[Embed(source = "../../assets/gfx/mpBarPlaceholder.png")] public static const GFX_PLAYER_MP_BAR :Class;
 		[Embed(source = "../../assets/gfx/WarriorIcon.png")] public static const GFX_PLAYER_FACE_ICON :Class;
 		[Embed(source = "../../assets/gfx/caveTiles.png")] public static const GFX_CAVE_TILES :Class;
-		
+		[Embed(source = "../../assets/gfx/dungeonTiles.png")] public static const GFX_DUNGEON_TILES :Class;
+		[Embed(source = "../../assets/gfx/dungeonTilesMarked.png")] public static const GFX_MARKED_TILES :Class;
 		
 		// SFX EMBEDS
 		[Embed(source = "../../assets/sfx/player_hurt.mp3")] public static const SFX_PLAYER_HURT :Class;
@@ -37,6 +38,10 @@ package game
 		//[Embed(source = "../../assets/bgm/beep_boop.mp3")] public static const RANDOM_SONG :Class;
 		
 		// MAP EMBEDS
+		[Embed(source = "../../assets/maps/level_indices.txt", mimeType = "application/octet-stream")] public static const MAP_LEVEL_INDICES :Class;
+		[Embed(source = "../../assets/maps/graphic_indices.txt", mimeType = "application/octet-stream")] public static const MAP_GRAPHIC_INDICES :Class;
+		[Embed(source = "../../assets/maps/testgraphic_indices.txt", mimeType = "application/octet-stream")] public static const MAP_TESTGRAPHIC_INDICES :Class;
+		[Embed(source = "../../assets/maps/chunk000.txt", mimeType = "application/octet-stream")] public static const MAP_CHUNK000 :Class;
 		
 		// FONT EMBEDS
 		

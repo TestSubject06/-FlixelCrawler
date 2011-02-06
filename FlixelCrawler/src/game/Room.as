@@ -1,5 +1,6 @@
 package game 
 {
+	import flash.utils.Dictionary;
 	import org.flixel.FlxGroup;
 	import org.flixel.FlxG;
 	import org.flixel.FlxSprite;
@@ -10,22 +11,13 @@ package game
 	// The Room class represents a single level, either of a dungeon or a town.
 	public class Room extends FlxGroup
 	{
-		// Room tile consts
-		public static const FLOOR :int = 16;
-		public static const LEFT_WALL :int = 10;
-		public static const TOP_WALL :int = 14;
-		public static const RIGHT_WALL :int = 12;
-		public static const BOTTOM_WALL :int = 22;
-		public static const UL_CORNER :int = 4;
-		public static const UR_CORNER :int = 7;
-		public static const BL_CORNER :int = 19;
-		public static const BR_CORNER :int = 1;
-		
-		// Room info
+		// General room info
 		public var dungeonLevel :int;
 		public var name :String;
 		public var tileSet :Class;
-		public var map :FlxTilemap;
+		public var floorMap :FlxTilemap, wallsMap :FlxTilemap;
+		// public var lightMap? lights up your character's line of vision (like Nethack), or in a circle 
+							//  around you (maybe only in dark areas), or both?
 		
 		
 		
@@ -36,19 +28,31 @@ package game
 			if (tileSet == null) tileSet = ResourceManager.GFX_CAVE_TILES;
 			else tileSet = TileSet;
 			
-			map = new FlxTilemap();
-			add(map, true);
+			floorMap = new FlxTilemap();
+			wallsMap = new FlxTilemap();
+			// lightMap = new FlxTilemap();
+			// add(bgMap, true); // don't add() it?
 		}
 		
 		
 		
+		// Update all the enmies, monsters, etc.
 		override public function update() :void
 		{
 			// before update stuff
 			
 			super.update();
+			// 
 			
 			// after update stuff
+		}
+		
+		
+		
+		// Render the floor, then players + walls vertically
+		override public function render() :void
+		{
+			// do it, bro.
 		}
 	}
 }

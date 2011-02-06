@@ -1,0 +1,17 @@
+1) If one player dies, all players die.
+2) If one player dies, he must sit out until everyone else dies (bad for long games)
+3) If a player dies, he comes back at level 1 (other players remain at level)
+4) If a player dies, he comes back 5 levels beneath his current level (and missing all of his equipment)
+5) If one player dies, he comes back w/ reduced exp and less items
+6) If a player dies, he comes back to life at no penalty.
+
+7) If a player dies, he remains lying dead on the ground and must be revived by a teammate.
+8) If a player dies, he drains levels from everyone until he is equal with them
+9) If a player dies he 
+10) If a player dies, he comes back to life but the max level cap for him is lowered
+11) If a player dies, he comes back to life but the max level cap for everyone is lowered
+12) there are 3 lives shared by everyone. when a player dies, it goes down by one. if it goes to zero, everyone dies.
+
+
+Single-player permadeath: you die, you start over.
+Multi-player permadeath: everyone dies, everyone starts over.

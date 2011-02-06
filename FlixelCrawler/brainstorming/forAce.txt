@@ -1,0 +1,78 @@
+Programming guide:
+- Try to plan as much out as possible ahead of time
+- Take breaks every 30 mins (important!)
+- 
+
+
+
+
+
+We're going to:
+
+//- check if we can make a room
+//- make a room
+//- turn the spot where this door is into GROUND
+//- randomly turn either one or both walls adjacent to this door into GROUND //  (shouldn't conflict w/ walls w/ multiple possible doors)
+// - swap rdi with possibleDoors.length-1, then pop() to delete it
+- create as many possble doors as you can along each wall of this new room. each of these new possible door MUST have both adjacent walls NOT be corners and leave a wall between another door on the same wall.
+
+
+XXXXXXXX
+X
+Xd
+X
+X
+X
+Xd
+X
+X
+X
+Xd
+X
+XXXXXXXX
+
+3 doors
+
+
+
+
+
+
+
+XXXXXXXXXX
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+X
+XXXXXXXXXX
+
+Priorities:
+- Merge, fix conflicts, and push something up.
+- Finish the auto-tiling
+- Make BasicGenerator better by adding multiple door possibilities for each room
+- Make ChunkGenerator actually work
+- Try to implement some simple lighting stuff.
+- Make mini chunks placeable by BasicGenerator (they may need to be rotated)
+- Try to fix render order for Room.
+- Make BasicGenerator better by allowing rooms to be connect by corridors? maybe these corridors can also have room offshoots?
+
+HEY
+since there is a distinction between full level prefabs and small chunk prefabs, you DON'T need to put chunks in LevelGenerator.
+

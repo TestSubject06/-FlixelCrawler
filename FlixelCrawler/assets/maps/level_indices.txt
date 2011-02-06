@@ -1,0 +1,6 @@
+ground 1
+wall 2
+door 3
+stairs 4
+chest 5
+water 6

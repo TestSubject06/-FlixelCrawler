@@ -1,16 +1,8 @@
 package game.states
 {
-	import game.PlayerStatusGUI;
-	import game.Room;
-	import org.flixel.FlxPoint;
-	import org.flixel.FlxSprite;
-	import org.flixel.FlxGroup;
-	import org.flixel.FlxState;
-	import org.flixel.FlxU;
-	import org.flixel.FlxG;
-	import org.flixel.data.FlxGamepad;
-	import game.ResourceManager; // HEY IS THERE A WAY TO GET RID OF THIS LINE
-	import game.Player;
+	import org.flixel.*;
+	import org.flixel.data.*;
+	import game.*; // HEY IS THERE A WAY TO GET RID OF THIS LINE
 	
 	
 
@@ -71,22 +63,19 @@ package game.states
 			// lyrBackdrop.add(new FlxSprite(0, 0, ResourceManager.GFX_TEST_BG));
 			
 			// Initialize players vec w/ one player (us) and three empty players.
-			players = new <Player>[new Player(200, 200, "Ace20"), null, null, null];
+			players = new <Player>[new Player(0, 0, "Ace20"), null, null, null];
 			
-			// Add the player(s) to the MGSprites layer.
-			for (var i: int = 0; i < players.length; i++)
-			{
-				lyrMGSprites.add(players[i]);
-			}
+			// Set up all level generators.
+			LevelGenerator.initialize();
+			
+			// Load a randomized room.
+			loadRoom(BasicGenerator.generate());
 			
 			// Add the GUIs for each player.
 			lyrGUI.add(new PlayerStatusGUI(0, 0, players[0]), true);
 			lyrGUI.add(new PlayerStatusGUI(150, 0, players[1]), true);
 			lyrGUI.add(new PlayerStatusGUI(300, 0, players[2]), true);
 			lyrGUI.add(new PlayerStatusGUI(450, 0, players[3]), true);
-				
-			loadRoom(generateRoom());
-			lyrBGMap.add(curRoom, true);
 			
 			// Set up the camera.
 			FlxG.follow(players[0], 5); // the Lerp thing is fucking weird.
@@ -108,57 +97,32 @@ package game.states
 		// This function will load in room into curRoom and make the necessary game updates.
 		public function loadRoom(room :Room) :void
 		{
+			if (room == null) return;
+			
+			lyrBackdrop.members = [];
+			lyrBGMap.members = [];
+			lyrBGSprites.members = [];
+			lyrMGSprites.members = [];
+			lyrFGSprites.members = [];
+			lyrFGMap.members = [];
+			lyrFX.members = [];
+			
 			curRoom = room;
-			FlxG.followBounds(0, 0, room.map.width - 32, room.map.height);
-		}
-		
-		
-		
-		// This function will randomly generate a room!
-		public function generateRoom() :Room
-		{
-			// Create a room of random width and height.
-			var room :Room = new Room();
+			FlxG.followBounds(0, 0, room.floorMap.width - 32, room.floorMap.height);
 			
-			var minSize :int = 40;
-			var maxSize :int = 160;
-			var w :int = minSize + (Math.random() * (maxSize - minSize));
-			var h :int = minSize + (Math.random() * (maxSize - minSize));
-			var level :Vector.<Vector.<int>> = new Vector.<Vector.<int>>(w, true);
+			// Add the map layers.
+			lyrBGMap.add(curRoom.floorMap, true);
+			lyrFGMap.add(curRoom.wallsMap, true);
+			// lyrFX.add(curRoom.lightMap, true); ?
 			
-			for (var i :int = 0; i < w; i++)
+			// Add the player(s) to the MGSprites layer.
+			for (var i: int = 0; i < players.length; i++)
 			{
-				level[i] = new Vector.<int>(h, true);
+				lyrMGSprites.add(players[i]);
 			}
 			
-			// Generate the layout for the room.
-			//var rooms 
-			
-			for (var j :int = 0; j < h; j++)
-			{
-				for (i = 0; i < w; i++)
-				{
-					level[i][j] = Room.FLOOR;
-				}
-			}
-
-			// Convert this level to CSV.
-			var mapCSV :String = "";
-			
-			for (j = 0; j < h; j++)
-			{
-				for (i = 0; i < w; i++)
-				{
-					mapCSV += (j == h-1 && i == w-1) ? ("" + level[i][j]) : ("" + level[i][j] + ", ");
-				}
-				
-				mapCSV += "\n";
-			}
-			
-			// Finally, create a tilemap from this CSV.
-			room.map.loadMap(mapCSV, room.tileSet, 32, 32);
-			
-			return room;
+			players[0].x = curRoom.floorMap.width / 2;
+			players[0].y = curRoom.floorMap.height / 2;
 		}
 	}
 }

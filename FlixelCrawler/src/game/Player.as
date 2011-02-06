@@ -20,7 +20,7 @@ package game
 		{
 			super(X, Y);
 			
-			moveSpeed = 180.0;
+			moveSpeed = 680.0;
 			loadGraphic(ResourceManager.GFX_ENEMY1);
 			width = 30;
 			height = 30;

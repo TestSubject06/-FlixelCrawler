@@ -1,0 +1,37 @@
+ul_floor 36
+u_floor 37
+ur_floor 38
+l_floor 42
+c_floor 43
+r_floor 44
+bl_floor 48
+b_floor 49
+br_floor 50
+
+ul_wall_top 6
+u_wall_top 7
+ur_wall_top 8
+l_wall_top 12
+c_wall_top 13
+r_wall_top 14
+bl_wall_top 18
+b_wall_top 19
+br_wall_top 20
+
+ul_wall_side 24
+u_wall_side 25
+ur_wall_side 26
+bl_wall_side 30
+b_wall_side 31
+br_wall_side 32
+
+l_thinwall_top 9
+horiz_thinwall_top 10
+r_thinwall_top 11
+u_thinwall_top 15
+vert_thinwall_top 21
+b_thinwall_top 27
+c_thinwall_top 17
+
+u_thinwall_side 23
+b_thinwall_side 29
