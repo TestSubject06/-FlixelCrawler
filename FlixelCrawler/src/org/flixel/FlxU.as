@@ -17,6 +17,9 @@ package org.flixel
 		 */
 		static public var quadTree:FlxQuadTree;
 		
+		// FOR FLIXELCRAWLER
+		static public var randomSeed :Number = NaN;
+		
 		/**
 		 * Opens a web page in a new tab or window.
 		 * 
@@ -63,26 +66,29 @@ package org.flixel
 		 * 
 		 * @return	A <code>Number</code> between 0 and 1.
 		 */
-		static public function random(Seed:Number=NaN):Number
+		static public function random() :Number
 		{
-			if(isNaN(Seed))
+			if(isNaN(randomSeed))
 				return Math.random();
 			else
 			{
 				//Make sure the seed value is OK
-				if(Seed == 0)
-					Seed = Number.MIN_VALUE;
-				if(Seed >= 1)
+				if(randomSeed == 0)
+					randomSeed = Number.MIN_VALUE;
+				if(randomSeed >= 1)
 				{
-					if((Seed%1) == 0)
-						Seed /= Math.PI;
-					Seed %= 1;
+					if((randomSeed%1) == 0)
+						randomSeed /= Math.PI;
+					randomSeed %= 1;
 				}
-				else if(Seed < 0)
-					Seed = (Seed % 1) + 1;
+				else if(randomSeed < 0)
+					randomSeed = (randomSeed % 1) + 1;
 				
 				//Then do an LCG thing and return a predictable random number
-				return ((69621 * int(Seed * 0x7FFFFFFF)) % 0x7FFFFFFF) / 0x7FFFFFFF;
+				var res :Number = ((69621 * int(randomSeed * 0x7FFFFFFF)) % 0x7FFFFFFF) / 0x7FFFFFFF;
+				randomSeed += res;
+				
+				return res;
 			}
 		}
 		

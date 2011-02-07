@@ -23,23 +23,24 @@
 		
 		
 		// Generates a basic level made up of random chunks.
-		public static function generate(TileSet :Class = null) :Room
+		public static function generate(RandomSeed :int = NaN, TileSet :Class = null) :Room
 		{
+			FlxU.randomSeed = RandomSeed;
 			if (TileSet == null) _tileSet = ResourceManager.GFX_DUNGEON_TILES;
 			else _tileSet = TileSet;
 			
 			// Create a level of somewhat random width and height.
 			var minSize :int = 30;
 			var maxSize :int = 120;
-			_w = minSize + (Math.random() * (maxSize - minSize));
-			_h = minSize + (Math.random() * (maxSize - minSize));
+			_w = minSize + (FlxU.random() * (maxSize - minSize));
+			_h = minSize + (FlxU.random() * (maxSize - minSize));
 			_level = new Vector.<Vector.<int>>(_w, true);
 			for (var i :int = 0; i < _w; i++) _level[i] = new Vector.<int>(_h, true);
 			
 			possibleDoors = new Vector.<FlxPoint>();
 			
 			var prefabChance :Number = 0.01; // chance of a room being a prefab.
-			var chunkCount :int = int(((_w + _h) / (2 * 15)) +  Math.random() * ((_w + _h) / (2 * 10)));
+			var chunkCount :int = int(((_w + _h) / (2 * 15)) +  FlxU.random() * ((_w + _h) / (2 * 10)));
 			
 			// Build the map!
 			var cc :int = 0;
@@ -47,8 +48,8 @@
 			while (cc < chunkCount && iterations < 1000)
 			{
 				// Random chunk width and height (includes walls).
-				var cw :int = 5 + (2 * int(Math.random() * 13));
-				var ch :int = 5 + (2 * int(Math.random() * 13));
+				var cw :int = 5 + (2 * int(FlxU.random() * 13));
+				var ch :int = 5 + (2 * int(FlxU.random() * 13));
 				var cx :int;
 				var cy :int;
 				
@@ -56,7 +57,7 @@
 				// Very first chunk generated.
 				if (cc == 0)
 				{
-					if (Math.random() < prefabChance)
+					if (FlxU.random() < prefabChance)
 					{
 						// prefab level? (RARE)
 						// probably not, I'd think the broad phase (PlayState) would handle that
@@ -81,7 +82,7 @@
 					// Keep trying to make chunks by checking random doors and building off of them.
 					while (!chunkCreated && iterations < 1000)
 					{
-						var rdi :int = Math.random() * possibleDoors.length; // randomDoor index
+						var rdi :int = FlxU.random() * possibleDoors.length; // randomDoor index
 						var randomDoor :FlxPoint = possibleDoors[rdi]; // A random potential door
 						
 						// Figure out which way this random door opens up toward.
@@ -96,7 +97,7 @@
 							continue; // this door already connecting two chunks together.
 						}
 						
-						if (Math.random() < prefabChance)
+						if (FlxU.random() < prefabChance)
 						{
 							//prefab chunk (will need rotation)
 							// Generate the layout for the room.
@@ -228,28 +229,28 @@
 					digDist = X - connectingDoor.x + 1;
 					
 					digDirection = new FlxPoint(1, 0);
-					adjacentSpace = new FlxPoint(0, 1 - (2 * int(Math.random() * 2)));
+					adjacentSpace = new FlxPoint(0, 1 - (2 * int(FlxU.random() * 2)));
 				}
 				else if (connectingDoor.y < Y)
 				{
 					digDist = Y - connectingDoor.y + 1;
 					
 					digDirection = new FlxPoint(0, 1);
-					adjacentSpace = new FlxPoint(1 - (2 * int(Math.random() * 2)), 0);
+					adjacentSpace = new FlxPoint(1 - (2 * int(FlxU.random() * 2)), 0);
 				}
 				else if (connectingDoor.x >= X + W)
 				{
 					digDist = connectingDoor.x - (X + W - 1) + 1;
 					
 					digDirection = new FlxPoint( -1, 0);
-					adjacentSpace = new FlxPoint(0, 1 - (2 * int(Math.random() * 2)));
+					adjacentSpace = new FlxPoint(0, 1 - (2 * int(FlxU.random() * 2)));
 				}
 				else if (connectingDoor.y >= Y + H)
 				{
 					digDist = connectingDoor.y - (Y + H - 1) + 1;
 					
 					digDirection = new FlxPoint(0, -1);
-					adjacentSpace = new FlxPoint(1 - (2 * int(Math.random() * 2)), 0);
+					adjacentSpace = new FlxPoint(1 - (2 * int(FlxU.random() * 2)), 0);
 				}
 				
 				// Make two tunnels in this direction, side by side.
@@ -260,7 +261,7 @@
 				}
 					
 				// 50% chance of making a third tunnel.
-				if (Math.random() < 0.5)
+				if (FlxU.random() < 0.5)
 				{
 					for (i = 0; i < digDist; i++)
 					{

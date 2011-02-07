@@ -138,7 +138,7 @@ package game.states
 				lyrMGSprites.add(player);
 				FlxG.log(player.active);
 			}
-			//set the player index (controller port essentially)
+			// Set the player index (controller port essentially)
 			playerIndex = id;
 			
 			//get the HUDS down
