@@ -126,15 +126,15 @@ package game.states
 			FlxG.log("Handling Game Init");
 			//setup a null array for the client to fill
 			players = new <Player>[null, null, null, null];
-			
+			FlxG.log("1");
 			//Fill it with the current players (only names right now)
-			for (var a:int = 1; a < m.length; a += 4) {
+			for (var a:int = 2; a < m.length; a += 4) {
 				//Make a new player             Server's X      Server's Y     Server's Name    no gfx so >:C
 				var player:Player = new Player(m.getInt(a+2), m.getInt(a+3), m.getString(a + 1),null);
-				players[Number(m.getString(a))] = player;
+				players[m.getInt(a)] = player;
 				
 				//Make sure player 0 doesnt control all the people who were there first. 'cause thats gay.
-				players[Number(m.getString(a))].playerIndex = Number(m.getString(a));
+				players[m.getInt(a)].playerIndex = m.getInt(a);
 				lyrMGSprites.add(player);
 				FlxG.log(player.active);
 			}
@@ -155,7 +155,7 @@ package game.states
 			FlxG.gamepads[playerIndex].bind("UP", "DOWN", "LEFT", "RIGHT", "Z", "X", "A", "C", "ENTER", ""     , "" , "" , "" , "" );7
 			
 			//Setup the room
-			loadRoom(BasicGenerator.generate());
+			loadRoom(BasicGenerator.generate(m.getInt(1)));
 			lyrBGMap.add(curRoom, true);
 			
 			//Tell the camera to follow your player
@@ -318,9 +318,10 @@ package game.states
 			{
 				lyrMGSprites.add(players[i]);
 			}
-			
-			players[0].x = curRoom.floorMap.width / 2;
-			players[0].y = curRoom.floorMap.height / 2;
+			if(players[playerIndex] != null){
+				players[playerIndex].x = curRoom.floorMap.width / 2;
+				players[playerIndex].y = curRoom.floorMap.height / 2;
+			}
 		}
 	}
 }
