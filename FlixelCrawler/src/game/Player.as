@@ -58,7 +58,6 @@ package game
 			else velocity.y = 0;
 			
 			super.updateMotion();
-			
 			//If the player has moved, send that shit!
 			if (firstx != x || firsty != y) {
 				PlayState(FlxG.state).connection.send("move", x, y, velocity.x, velocity.y);

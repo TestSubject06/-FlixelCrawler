@@ -38,7 +38,7 @@ package game.states
 		public var lyrGUI :FlxGroup;
 	
 		// Our actual game stuff.
-		public var players :Vector.<Player>;
+		public var players :Vector.<Player> = new <Player>[null, null, null, null];
 		public var playerHUDS:Vector.<PlayerStatusGUI>;
 		public var neighboringRooms :Vector.<Room>;
 		public var curRoom :Room;
@@ -109,7 +109,7 @@ package game.states
 		private function handleJoin(connection :Connection) :void
 		{
 			// Now that we've established a connection, set up all our event callbacks.
-			FlxG.log("Alright Connected to a Game. Though nothing cool happens yet");
+			//FlxG.log("Alright Connected to a Game. Though nothing cool happens yet");
 			this.connection = connection;
 			
 			connection.addMessageHandler("GameInit", handleGameInit);
@@ -123,6 +123,7 @@ package game.states
 		// This is called when a client first connects. this tells the player of all the positions of everything it needs to know.
 		private function handleGameInit(m :Message, id :int) :void
 		{
+			FlxG.log("Handling Game Init");
 			//setup a null array for the client to fill
 			players = new <Player>[null, null, null, null];
 			
@@ -134,8 +135,9 @@ package game.states
 				
 				//Make sure player 0 doesnt control all the people who were there first. 'cause thats gay.
 				players[Number(m.getString(a))].playerIndex = Number(m.getString(a));
+				lyrMGSprites.add(player);
+				FlxG.log(player.active);
 			}
-			
 			//set the player index (controller port essentially)
 			playerIndex = id;
 			
@@ -147,10 +149,14 @@ package game.states
 			lyrGUI.add(playerHUDS[3], true);
 			
 			//Take control of your player
-			players[playerIndex].takeControl(playerIndex);
+			//players[playerIndex].takeControl(playerIndex);
 			
 			//bind your keys to your 'virtual controller'
-			FlxG.gamepads[playerIndex].bind("UP", "DOWN", "LEFT", "RIGHT", "Z", "X", "A", "C", "ENTER", ""     , "" , "" , "" , "" );
+			FlxG.gamepads[playerIndex].bind("UP", "DOWN", "LEFT", "RIGHT", "Z", "X", "A", "C", "ENTER", ""     , "" , "" , "" , "" );7
+			
+			//Setup the room
+			loadRoom(BasicGenerator.generate());
+			lyrBGMap.add(curRoom, true);
 			
 			//Tell the camera to follow your player
 			FlxG.follow(players[playerIndex], 5);
@@ -250,19 +256,19 @@ package game.states
 			// lyrBackdrop.add(new FlxSprite(0, 0, ResourceManager.GFX_TEST_BG));
 			
 			// Initialize players vec w/ one player (us) and three empty players.
-			players = new <Player>[new Player(0, 0, "Ace20"), null, null, null];
+			//players = new <Player>[new Player(0, 0, "Ace20"), null, null, null];
 			
 			// Set up all level generators.
 			LevelGenerator.initialize();
 			
 			// Load a randomized room.
-			loadRoom(BasicGenerator.generate());
+			//loadRoom(BasicGenerator.generate());
 			
 			// Add the GUIs for each player.
-			lyrGUI.add(new PlayerStatusGUI(0, 0, players[0]), true);
-			lyrGUI.add(new PlayerStatusGUI(150, 0, players[1]), true);
-			lyrGUI.add(new PlayerStatusGUI(300, 0, players[2]), true);
-			lyrGUI.add(new PlayerStatusGUI(450, 0, players[3]), true);
+			//lyrGUI.add(new PlayerStatusGUI(0, 0, players[0]), true);
+			//lyrGUI.add(new PlayerStatusGUI(150, 0, players[1]), true);
+			//lyrGUI.add(new PlayerStatusGUI(300, 0, players[2]), true);
+			//lyrGUI.add(new PlayerStatusGUI(450, 0, players[3]), true);
 			
 			////          |
 			////          |
@@ -271,8 +277,7 @@ package game.states
 			////          V
 			//this DEFINATELY needs to happen serverside. or AT LEAST the first client to generate tells the server about it.
 			//	Stay tuned for more news on that at '11.
-			loadRoom(BasicGenerator.generate());
-			lyrBGMap.add(curRoom, true);
+			
 		}
 		
 		
@@ -281,7 +286,6 @@ package game.states
 		{
 			// Update totalElapsed.
 			totalElapsed += FlxG.elapsed;
-			
 			// Update every add()'d game object.
 			super.update(); // before totalElapsed update? or after?
 		}
