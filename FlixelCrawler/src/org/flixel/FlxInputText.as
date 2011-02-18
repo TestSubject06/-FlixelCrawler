@@ -28,6 +28,7 @@ License: Creative Commons Attribution 3.0 United States
 package org.flixel{
 	import flash.events.Event;
 	import flash.text.TextFieldType;
+	import org.flixel.FlxG;
 
 	//@desc		Input field class that "fits in" with Flixel's workflow
 	public class FlxInputText extends FlxText {
@@ -48,8 +49,11 @@ package org.flixel{
 		//@desc		If this is set to true, text typed is forced to be uppercase
 		public var forceUpperCase:Boolean							= false;
 
+		// FOR FLIXELCRAWLER
+		public var callback :Function;
+
 		//@desc		Same parameters as FlxText
-		public function FlxInputText(X:Number, Y:Number, Width:uint, Height:uint, Text:String, Color:uint=0x000000, Font:String=null, Size:uint=8, Justification:String=null, Angle:Number=0)
+		public function FlxInputText(X:Number, Y:Number, Width:uint, Height:uint, Text:String, Color:uint=0x000000, Font:String=null, Size:uint=8, Justification:String=null, Angle:Number=0, CallBack:Function=null)
 		{
 			//super(X, Y, Width, Height, Text, Color, Font, Size, Justification, Angle);
 			super(X, Y, Width, Text);
@@ -65,6 +69,7 @@ package org.flixel{
 			_tf.height = Height;
 			this.height = Height;
 			this.angle = Angle;
+			this.callback = CallBack;
 			
 			_tf.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			_tf.addEventListener(Event.REMOVED_FROM_STAGE, onInputFieldRemoved);
@@ -102,20 +107,27 @@ package org.flixel{
 		
 		private function onTextChange(event:Event):void
 		{
-			if(forceUpperCase)
-				_tf.text = _tf.text.toUpperCase();
-				
-			if(filterMode != NO_FILTER) {
-				var pattern:RegExp;
-				switch(filterMode) {
-					case ONLY_ALPHA:		pattern = /[^a-zA-Z]*/g;		break;
-					case ONLY_NUMERIC:		pattern = /[^0-9]*/g;			break;
-					case ONLY_ALPHANUMERIC:	pattern = /[^a-zA-Z0-9]*/g;		break;
-					case CUSTOM_FILTER:		pattern = customFilterPattern;	break;
-					default:
-						throw new Error("FlxInputText: Unknown filterMode ("+filterMode+")");
+			if (FlxG.keys.justPressed("ENTER"))
+			{
+				callback.call();
+			}
+			else
+			{
+				if(forceUpperCase)
+					_tf.text = _tf.text.toUpperCase();
+					
+				if(filterMode != NO_FILTER) {
+					var pattern:RegExp;
+					switch(filterMode) {
+						case ONLY_ALPHA:		pattern = /[^a-zA-Z]*/g;		break;
+						case ONLY_NUMERIC:		pattern = /[^0-9]*/g;			break;
+						case ONLY_ALPHANUMERIC:	pattern = /[^a-zA-Z0-9]*/g;		break;
+						case CUSTOM_FILTER:		pattern = customFilterPattern;	break;
+						default:
+							throw new Error("FlxInputText: Unknown filterMode ("+filterMode+")");
+					}
+					_tf.text = _tf.text.replace(pattern, "");
 				}
-				_tf.text = _tf.text.replace(pattern, "");
 			}
 		}
 		

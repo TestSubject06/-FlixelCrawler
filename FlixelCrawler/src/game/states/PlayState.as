@@ -1,5 +1,6 @@
 package game.states
 {
+	import adobe.utils.CustomActions;
 	import org.flixel.*;
 	import org.flixel.data.*;
 	import game.*; // HEY IS THERE A WAY TO GET RID OF THIS LINE
@@ -15,7 +16,7 @@ package game.states
 	import org.flixel.FlxU;
 	import org.flixel.FlxG;
 	import org.flixel.data.FlxGamepad;
-	import game.ResourceManager; // Nope.
+	import game.ResourceManager;
 	import game.Player;
 	import playerio.*
 	
@@ -26,24 +27,35 @@ package game.states
     {	
 		// General PlayState stuff
 		public var totalElapsed :Number; // total elapsed time since state's start.
+		public var controlType :int; // 0 is LUDR movement, 1 is WASD movement
 		
-		// Visual/Parallax Layers
-		public var lyrBackdrop :FlxGroup; // might not be needed
-		public var lyrBGMap :FlxGroup; // the level iteself
-		public var lyrBGSprites :FlxGroup; // items, gold, etc.
-		public var lyrMGSprites :FlxGroup; // players, enemies, etc.
-		public var lyrFGSprites :FlxGroup; // spells, darts, etc.
-		public var lyrFGMap :FlxGroup; // since we're doing 3/4 view, we need this to overlay some things
+		// Our actual game stuff.
+		public var players :Vector.<Player>;
+		public var player :Player;
+		public var playerHUDS:Vector.<PlayerStatusGUI>;
+		public var dungeonSeed :int; // The random number used to add some randomness to the dungeon layout.
+		public var dungeonLayout :Vector.<Vector.<Room>>; // The layout of the entire dungeon.
+		public var curRoom :Room; // The room the player is currently in.
+		public var justChangedRoom :Boolean;
+		
+		// The visual stuff for the room.
+		public var floorMap :FlxTilemap;
+		public var floorShadowsMap :FlxTilemap;
+		public var wallMap :FlxTilemap;
+		public var transWallMap :FlxTilemap;
+		public var lightingMap :FlxTilemap;
+		
+		// Object groupings
+		public var stairsUp :FlxGroup;
+		public var stairsDown :FlxGroup;
+		public var enemies :FlxGroup;
+		public var chests :FlxGroup;
+		
+		// Visual layers that sit on top of everything
 		public var lyrFX :FlxGroup;
 		public var lyrGUI :FlxGroup;
-	
-		// Our actual game stuff.
-		public var players :Vector.<Player> = new <Player>[null, null, null, null];
-		public var playerHUDS:Vector.<PlayerStatusGUI>;
-		public var neighboringRooms :Vector.<Room>;
-		public var curRoom :Room;
 		
-		//MP stuff
+		// Multiplayer connection stuff
 		public var connection:Connection;
 		public var playerIndex:int;
 		
@@ -51,13 +63,14 @@ package game.states
 		
 		override public function create():void
 		{
+			// We immediately set ResourceManager.playState to this instance.
+			ResourceManager.playState = this;
+			
 			// Show the mouseNEVERMIND MOUSE DOESN'T EXIST YET LOLL
 			// FlxG.mouse.cursor.visible = false;
 			
 			// Stage is defined by the time create() is called, so connection must be done here rather than the constructor.
-			var blah :Prompt = new Prompt(200, 200, "What's your name?", tryConnect);
-			
-			add(blah);
+			add(new Prompt(200, 200, "Where is the mouse cursor?", tryConnect)); //"What is your player's name?"
 		}
 		
 		
@@ -124,24 +137,103 @@ package game.states
 		private function handleGameInit(m :Message, id :int) :void
 		{
 			FlxG.log("Handling Game Init");
-			//setup a null array for the client to fill
-			players = new <Player>[null, null, null, null];
-			FlxG.log("1");
-			//Fill it with the current players (only names right now)
-			for (var a:int = 2; a < m.length; a += 4) {
-				//Make a new player             Server's X      Server's Y     Server's Name    no gfx so >:C
-				var player:Player = new Player(m.getInt(a+2), m.getInt(a+3), m.getString(a + 1),null);
-				players[m.getInt(a)] = player;
-				
-				//Make sure player 0 doesnt control all the people who were there first. 'cause thats gay.
-				players[m.getInt(a)].playerIndex = m.getInt(a);
-				lyrMGSprites.add(player);
-				FlxG.log(player.active);
-			}
-			// Set the player index (controller port essentially)
-			playerIndex = id;
 			
-			//get the HUDS down
+			// Set up the tilemaps for the current level.
+			floorMap = new FlxTilemap();
+			floorMap.solid = false;
+			floorMap.moves = false;
+			
+			floorShadowsMap = new FlxTilemap();
+			floorShadowsMap.solid = false;
+			floorShadowsMap.moves = false;
+			
+			wallMap = new FlxTilemap();
+			wallMap.solid = true;
+			wallMap.moves = false;
+			
+			transWallMap = new FlxTilemap();
+			transWallMap.solid = false;
+			transWallMap.moves = false;
+			
+			lightingMap = new FlxTilemap();
+			lightingMap.solid = false;
+			lightingMap.moves = false;
+			
+			// Set up the entities for the current level.
+			stairsUp = new FlxGroup();
+			stairsDown = new FlxGroup();
+			enemies = new FlxGroup();
+			chests = new FlxGroup();
+			
+			// Set up visual layers on top of the room.
+			lyrFX = new FlxGroup();
+			lyrFX.scrollFactor = new FlxPoint(0, 0);
+			lyrGUI = new FlxGroup();
+			lyrGUI.scrollFactor = new FlxPoint(0, 0);
+			
+			// Add all these tilemaps and entity groups to update() loop.
+			add(floorMap);
+			add(stairsUp);
+			add(stairsDown);
+			add(floorShadowsMap);
+			add(chests);
+			add(enemies);
+			add(wallMap);
+			add(transWallMap);
+			add(lightingMap);
+			add(lyrFX);
+			add(lyrGUI);
+			
+			// Each player is null by default.
+			player = new Player(200, 200, "TEST", null);
+			players = new <Player>[null, null, null, null];
+			
+			// Set the dungeon layout seed to something random, and set up the dungeon layout.
+			dungeonSeed = 10; //int(Math.random() * int.MAX_VALUE)
+			
+			// Set the first room up w/ a random seed.
+			//var firstRoomSeed :int = 20;
+			
+			// If we got a message (a connection), load them in. Otherwise, just do singleplayer.
+			// I THINK I BROKE THIS AGAINLOL
+			
+			if (m != null)
+			{
+				//Fill it with the current players (only names right now)
+				for (var a:int = 2; a < m.length; a += 4)
+				{
+					//Make a new player            Server's X     Server's Y     Server's Name     no gfx so >:C
+					var p:Player = new Player(m.getInt(a+2), m.getInt(a+3), m.getString(a+1), null);
+					players[m.getInt(a)] = p;
+					
+					//Make sure player 0 doesnt control all the people who were there first. 'cause thats gay.
+					players[m.getInt(a)].playerIndex = m.getInt(a);
+					//FlxG.log(player.active);
+				}
+				
+				// Set dungeon seed
+				// dungeonSeed = m.getInt(?);
+				
+				// Set first room seed.
+				// firstRoomSeed = m.getInt(?);
+		    }
+			else
+			{
+				// We couldn't connect to a server, so just start a local game.
+				// Set player 0 to be us.
+				players[0] = player;
+				player.playerIndex = 0;
+				
+				FlxG.log("NO GAMEINIT MESSAGE RECEIVED. LOADING TEST MAP.");
+			}
+			
+			// Add all players to the update loop.
+			for (var i :int; i < 4; i++)
+			{
+				if (players[i] != null) add(players[i]);
+			}
+			
+			// Make the players' HUDS and also add them to the update loop.
 			playerHUDS = new <PlayerStatusGUI>[new PlayerStatusGUI(2, 2, players[0]), new PlayerStatusGUI(164, 2, players[1]), new PlayerStatusGUI(326, 2, players[2]), new PlayerStatusGUI(488, 2, players[3])];
 			lyrGUI.add(playerHUDS[0], true);
 			lyrGUI.add(playerHUDS[1], true);
@@ -151,15 +243,16 @@ package game.states
 			//Take control of your player
 			//players[playerIndex].takeControl(playerIndex);
 			
-			//bind your keys to your 'virtual controller'
-			FlxG.gamepads[playerIndex].bind("UP", "DOWN", "LEFT", "RIGHT", "Z", "X", "A", "C", "ENTER", ""     , "" , "" , "" , "" );7
+			// Generate the dungeon layout.
+			generateDungeonLayout();	
 			
-			//Setup the room
-			loadRoom(BasicGenerator.generate(m.getInt(1)));
-			lyrBGMap.add(curRoom, true);
+			// Bind your inputs!
+								// UP    DOWN    LEFT    RIGHT    A        X   B   Y    START    SELECT  LI   L2   R1   R2
+			FlxG.gamepads[0].bind("UP", "DOWN", "LEFT", "RIGHT", "ENTER", "", "", "X", "SPACE", "T"   , "A", "S", "D", "");
+			FlxG.gamepads[1].bind("W" , "S"   , "A"   , "D"    , "ENTER", "", "", "J", "SPACE", "T"   , "1", "2", "3", "");
 			
-			//Tell the camera to follow your player
-			FlxG.follow(players[playerIndex], 5);
+			// Setup the room
+			loadRoom(dungeonLayout[0][0], 0);
 			
 			// Some helpful text
 			if (players[1] == null)
@@ -191,13 +284,19 @@ package game.states
 			if (id == playerIndex) return;
 			
 			//A new user has joined! Lets give him a player
-			var player:Player = new Player(200, 200, m.getString(1),null);
-			players[id] = player;
-			lyrFGSprites.add(player);
+			if (players[id] != null)
+			{
+				players[id].playerIndex = id;
+			}
+			else
+			{
+				players[id] = new Player(200, 200, m.getString(1),null);
+				add(players[id]);
+			}
 			players[id].takeControl(id);
+			
 			//and give that player to his HUD
 			playerHUDS[id].addPlayer(players[id]);
-			//FlxG.log(players[Number(id) - 1]);
 		}
 		
 		
@@ -207,9 +306,8 @@ package game.states
 		{
 			FlxG.log("User ID: " + (Number(id)) + " has left");
 			//Boo someone left. Quick tear his shit down!
-			lyrFGSprites.remove(players[Number(id)]); // wow that's kind of extreme don't you think
-			players[Number(id)] = null;
-			playerHUDS[Number(id)].removePlayer();
+			players[id] = null;
+			playerHUDS[id].removePlayer();
 		}
 		
 		
@@ -219,6 +317,8 @@ package game.states
 		{
 			FlxG.log("Couldn't Connect");
 			FlxG.log(error.getStackTrace());
+			
+			handleGameInit(null, 0);
 		}
 		
 		
@@ -229,41 +329,10 @@ package game.states
 			// Set up general state stuff.
 			totalElapsed = 0.0;
 			
-			// Set up visual/parallax layers.
-			lyrBackdrop = new FlxGroup();
-			lyrBackdrop.scrollFactor = new FlxPoint(0, 0); // should it scroll? probably not?
-			lyrBGMap = new FlxGroup();
-			lyrBGSprites = new FlxGroup();
-			lyrMGSprites = new FlxGroup();
-			lyrFGSprites = new FlxGroup();
-			lyrFGMap = new FlxGroup();
-			lyrFX = new FlxGroup();
-			lyrFX.scrollFactor = new FlxPoint(0, 0);
-			lyrGUI = new FlxGroup();
-			lyrGUI.scrollFactor = new FlxPoint(0, 0);
-			
-			// Add visual/parallax layers to the FlxState so that they update/render.
-			add(lyrBackdrop);
-			add(lyrBGMap);
-			add(lyrBGSprites);
-			add(lyrMGSprites);
-			add(lyrFGSprites);
-			add(lyrFGMap);
-			add(lyrFX);
-			add(lyrGUI);
-			
-			// Add a backdrop.
-			// lyrBackdrop.add(new FlxSprite(0, 0, ResourceManager.GFX_TEST_BG));
-			
-			// Initialize players vec w/ one player (us) and three empty players.
-			//players = new <Player>[new Player(0, 0, "Ace20"), null, null, null];
-			
-			// Set up all level generators.
+			// Set up the level generator.
 			LevelGenerator.initialize();
 			
-			// Load a randomized room.
-			//loadRoom(BasicGenerator.generate());
-			
+			justChangedRoom = false;
 			// Add the GUIs for each player.
 			//lyrGUI.add(new PlayerStatusGUI(0, 0, players[0]), true);
 			//lyrGUI.add(new PlayerStatusGUI(150, 0, players[1]), true);
@@ -287,40 +356,134 @@ package game.states
 			// Update totalElapsed.
 			totalElapsed += FlxG.elapsed;
 			// Update every add()'d game object.
+			
+			if (justChangedRoom)
+			{
+				justChangedRoom = false;
+				FlxG.follow(player, 6);
+			}
+			// Update the camera's followAdjust according the player's INPUTS, not movement. (wait, that'll suck for sharp turning)
+			//FlxG.followAdjust(player.buttonHeldDuration (not if hitting wall though)/cameraTweenDuration, etc); // update in real time
+			
 			super.update(); // before totalElapsed update? or after?
+			
+			// do collides AFTER the update.
+			if (players != null && wallMap != null) players[playerIndex].collide(wallMap);
 		}
 		
 		
 		
 		// This function will load in room into curRoom and make the necessary game updates.
-		public function loadRoom(room :Room) :void
+		public function loadRoom(room :Room, stairIndex :int) :void
 		{
 			if (room == null) return;
 			
-			lyrBackdrop.members = [];
-			lyrBGMap.members = [];
-			lyrBGSprites.members = [];
-			lyrMGSprites.members = [];
-			lyrFGSprites.members = [];
-			lyrFGMap.members = [];
+			stairsUp.members = [];
+			stairsDown.members = [];
+			enemies.members = [];
+			chests.members = [];
 			lyrFX.members = [];
 			
+			/*
+			floorMap = new FlxTilemap();
+			floorShadowsMap = new FlxTilemap();
+			wallMap = new FlxTilemap();
+			transWallMap = new FlxTilemap();
+			lightingMap = new FlxTilemap();
+			*/
+			
+			var movedDownward :Boolean = true;
+			if (curRoom != null && curRoom.depth > room.depth) movedDownward = false;
+			
 			curRoom = room;
-			FlxG.followBounds(0, 0, room.floorMap.width - 32, room.floorMap.height);
+			curRoom.generator.call(NaN, curRoom.seed, curRoom.tileSet);
 			
-			// Add the map layers.
-			lyrBGMap.add(curRoom.floorMap, true);
-			lyrFGMap.add(curRoom.wallsMap, true);
-			// lyrFX.add(curRoom.lightMap, true); ?
+			FlxG.followBounds(0, 0, floorMap.width, floorMap.height);
+			FlxG.unfollow();
 			
-			// Add the player(s) to the MGSprites layer.
-			for (var i: int = 0; i < players.length; i++)
+			// Put our player at the stairs he came from.
+			if (movedDownward && stairsUp.members[stairIndex] != null) // why check this again?
 			{
-				lyrMGSprites.add(players[i]);
+				player.x = (stairsUp.members[stairIndex] as FlxObject).x;
+				player.y = (stairsUp.members[stairIndex] as FlxObject).y;
 			}
-			if(players[playerIndex] != null){
-				players[playerIndex].x = curRoom.floorMap.width / 2;
-				players[playerIndex].y = curRoom.floorMap.height / 2;
+			else if (!movedDownward && stairsDown.members[stairIndex] != null)
+			{
+				player.x = (stairsDown.members[stairIndex] as FlxObject).x;
+				player.y = (stairsDown.members[stairIndex] as FlxObject).y;
+			}
+			else
+			{
+				FlxG.log("FUCK");
+			}
+			
+			justChangedRoom = true;
+			player.canMove = true;
+			
+			FlxG.flash.start(FlxU.getColor(0, 0, 0, 1.0), 0.3, null, true);
+		}
+		
+		
+		
+		public function generateDungeonLayout() :void
+		{
+			// Get the dungeon layout ready for generation.
+			dungeonLayout = new Vector.<Vector.<Room>>();
+			
+			var doneGenerating:Boolean = false;
+			var curDepth :int = 0;
+			
+			// Set the randomSeed for the dungeon.
+			FlxU.randomSeed = dungeonSeed;
+			
+			// Generate the dungeon layout from the dungeon seed.
+			while (!doneGenerating)
+			{
+				// First of all, set up the level underneath the current one.
+				dungeonLayout.push(new Vector.<Room>());
+				
+				if (curDepth == 0)
+				{
+					// Make a room on this level since there isn't one there already.
+					dungeonLayout[0].push(new Room(int(FlxU.random() * int.MAX_VALUE), BasicGenerator.generate, ResourceManager.GFX_DUNGEON_TILES, curDepth));
+					dungeonLayout[curDepth][0].roomsAbove[0] = null; // this is the top floor, no rooms above.
+				}
+				else if (curDepth > 0 && curDepth < 6)
+				{
+					// We are on levels 1 to 5 of the dungeon.
+					// Make a new room here.
+					dungeonLayout[curDepth].push(new Room(int(FlxU.random() * int.MAX_VALUE), BasicGenerator.generate, ResourceManager.GFX_DUNGEON_TILES, curDepth));
+					
+					// Connect it to the room above.
+					dungeonLayout[curDepth - 1][0].roomsBelow[0] = dungeonLayout[curDepth][0];
+					dungeonLayout[curDepth][0].roomsAbove[0] = dungeonLayout[curDepth - 1][0];
+				}
+				else if (curDepth >= 6 && curDepth < 10 - 1) // Maximum depth of 10 levels, for now.
+				{
+					// We are on levels 6 to 9 of the dungeon.
+					// Make a new room here.
+					dungeonLayout[curDepth].push(new Room(int(FlxU.random() * int.MAX_VALUE), BasicGenerator.generate, ResourceManager.GFX_DUNGEON_TILES, curDepth));
+					
+					// Connect it to the room above.
+					dungeonLayout[curDepth-1][0].roomsBelow[0] = dungeonLayout[curDepth][0];
+					dungeonLayout[curDepth][0].roomsAbove[0] = dungeonLayout[curDepth-1][0];
+				}
+				else
+				{
+					// We've reached the bottom of the dungeon!
+					// Make a new room here.
+					dungeonLayout[curDepth].push(new Room(int(FlxU.random() * int.MAX_VALUE), BasicGenerator.generate, ResourceManager.GFX_DUNGEON_TILES, curDepth));
+					dungeonLayout[curDepth][0].roomsBelow[0] = null; // this is the bottom floor, no rooms below.
+					
+					// Connect it to the room above.
+					dungeonLayout[curDepth-1][0].roomsBelow[0] = dungeonLayout[curDepth][0];
+					dungeonLayout[curDepth][0].roomsAbove[0] = dungeonLayout[curDepth-1][0];
+					
+					// We're done generating this dungeon.
+					doneGenerating = true;
+				}
+				
+				curDepth++;
 			}
 		}
 	}

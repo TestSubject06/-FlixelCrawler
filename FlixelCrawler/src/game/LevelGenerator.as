@@ -1,11 +1,14 @@
 ﻿package game
 {
+	import game.states.*;
+	import org.flashdevelop.utils.FlashConnect;
 	import org.flixel.*;
 	import org.flixel.data.*;
 	
 	
 	
 	// The LevelGenerator class is a base class for all level generators!
+	// This class (and by extension, all its subclasses) are SINGLETONS.
 	public class LevelGenerator
 	{
 		// Flag for initializing static stuff
@@ -94,17 +97,24 @@
 		
 		// The level data
 		protected static var _level :Vector.<Vector.<int>>;
-		protected static var _floorMap :Vector.<Vector.<int>>
-		protected static var _wallsMap :Vector.<Vector.<int>>
+		protected static var _floorMap :Vector.<Vector.<int>>;
+		protected static var _wallMap :Vector.<Vector.<int>>;
 		protected static var _w :int;
 		protected static var _h :int;
 		protected static var _tileSet :Class;
 		
 		
 		
-		// Converts the generated level to a CSV string for tilemap loading.
-		// This function autotiles the level according the the graphic tile indices.
-		protected static function convertToRoom() :Room
+		
+		protected static function generate(RandomSeed :int = NaN, TileSet :Class = null) :void
+		{
+			// Others override this.
+		}
+		
+		
+		
+		// Autotiles the generated level, converts it to a CSV string, and loads the tilemaps with it.
+		protected static function loadTilemaps() :void
 		{
 			// Run through map and turn all EMPTY tiles into WALL tiles. Also, make sure the level
 			// is surrounded by wall tiles.
@@ -119,8 +129,8 @@
 			// init variables
 			_floorMap = new Vector.<Vector.<int>>(_w, true);
 			for (i = 0; i < _w; i++) _floorMap[i] = new Vector.<int>(_h, true);
-			_wallsMap = new Vector.<Vector.<int>>(_w, true);
-			for (i = 0; i < _w; i++) _wallsMap[i] = new Vector.<int>(_h, true);
+			_wallMap = new Vector.<Vector.<int>>(_w, true);
+			for (i = 0; i < _w; i++) _wallMap[i] = new Vector.<int>(_h, true);
 			
 			// The auto-tiling algorithm! This converts the raw level data into graphical tiles indices.
 			// Notte that this function isn't completely optimized for the walls, since you could probably record
@@ -176,13 +186,13 @@
 							if (leftTile != WALL && rightTile != WALL && downTile != WALL)
 							{
 								// Set the base wall for the floor map to be a thin vert wall side.
-								_floorMap[i][j] = _b_thinwall_side;
+								_wallMap[i][j] = _b_thinwall_side; // THESE USED TO BE DONE TO FLOORMAP.
 								
 								// Check if this is longer vertical wall or just a single pillar.
 								if (upTile == WALL)
 								{
 									// Long vertical wall. Put the corresponding SOLID upper wall side tile.
-									_wallsMap[i][j - 1] = _u_thinwall_side;
+									_wallMap[i][j - 1] = _u_thinwall_side;
 									
 									// Now, move upwards gradually from this tile, setting each's wallTop correctly.
 									autoTileWallTopsUpward(i, j); // start here since it doesn't have a top yet.
@@ -190,63 +200,63 @@
 								else if (upTile != -1)
 								{
 									// This is a single vertical column.
-									_wallsMap[i][j - 1] = _u_thinwall_side_trans;
-									if (j - 2 >= 0) _wallsMap[i][j - 2] = _c_thinwall_top_trans;
+									_wallMap[i][j - 1] = _u_thinwall_side_trans;
+									if (j - 2 >= 0) _wallMap[i][j - 2] = _c_thinwall_top_trans;
 								}
 							}
 							// Bottom-left piece of wall or leftmost piece of thin, horizontal wall.
 							else if (leftTile != WALL && rightTile == WALL && downTile != WALL)
 							{
 								// Set the base wall for the floor map to be a bl wall side.
-								_floorMap[i][j] = _bl_wall_side;
+								_wallMap[i][j] = _bl_wall_side;
 								
 								// Check if this wall is a thin horizontal one or not.
 								if (upTile == WALL)
 								{
-									_wallsMap[i][j - 1] = _ul_wall_side;
+									_wallMap[i][j - 1] = _ul_wall_side;
 									
 									// Now, move upwards gradually from this tile, setting each's wallTop correctly.
 									autoTileWallTopsUpward(i, j); // start here since it doesn't have a top yet.
 								}
 								else if (upTile != -1)
 								{
-									_wallsMap[i][j - 1] = _ul_wall_side_trans;
-									if (j - 2 >= 0) _wallsMap[i][j - 2] = _l_thinwall_top_trans;
+									_wallMap[i][j - 1] = _ul_wall_side_trans;
+									if (j - 2 >= 0) _wallMap[i][j - 2] = _l_thinwall_top_trans;
 								}
 							}
 							// Bottom center piece of a wide wall.
 							else if (leftTile == WALL && rightTile == WALL && downTile != WALL)
 							{
-								_floorMap[i][j] = _b_wall_side;
+								_wallMap[i][j] = _b_wall_side;
 								
 								if (upTile == WALL)
 								{
-									_wallsMap[i][j - 1] = _u_wall_side;
+									_wallMap[i][j - 1] = _u_wall_side;
 									
 									// Now, move upwards gradually from this tile, setting each's wallTop correctly.
 									autoTileWallTopsUpward(i, j); // start here since it doesn't have a top yet.
 								}
 								else if (upTile != -1)
 								{
-									_wallsMap[i][j - 1] = _u_wall_side_trans;
-									if (j - 2 >= 0) _wallsMap[i][j - 2] = _horiz_thinwall_top_trans;
+									_wallMap[i][j - 1] = _u_wall_side_trans;
+									if (j - 2 >= 0) _wallMap[i][j - 2] = _horiz_thinwall_top_trans;
 								}
 							}
 							// Bottom-right piece of wall or leftmost piece of thin, horizontal wall.
 							else if (leftTile == WALL && rightTile != WALL && downTile != WALL)
 							{
-								_floorMap[i][j] = _br_wall_side;
+								_wallMap[i][j] = _br_wall_side;
 								
 								if (upTile == WALL)
 								{
-									_wallsMap[i][j - 1] = _ur_wall_side;
+									_wallMap[i][j - 1] = _ur_wall_side;
 									
 									// Now, move upwards gradually from this tile, setting each's wallTop correctly.
 									autoTileWallTopsUpward(i, j); // start here since it doesn't have a top yet.
 								}
 								else if (upTile != -1)
 								{
-									_wallsMap[i][j-1] = _ur_wall_side_trans;
+									_wallMap[i][j-1] = _ur_wall_side_trans;
 								}
 							}
 							// Finally, make sure all the dark spots are filled in by auto-tiling upwards from the very bottom.
@@ -281,26 +291,66 @@
 			
 			// Convert maps to CSV.
 			var floorMapCSV :String = "";
-			var wallsMapCSV :String = "";
+			var floorShadowsMapCSV :String = "";
+			var wallMapCSV :String = "";
+			var transWallMapCSV :String = "";
+			var lightingMapCSV :String = "";
 			
 			for (j = 0; j < _h; j++)
 			{
 				for (i = 0; i < _w; i++)
 				{
-					floorMapCSV += (i == _w - 1 && j == _h - 1) ? ("" + _floorMap[i][j]) : ("" + _floorMap[i][j] + ", ");
-					wallsMapCSV += (i == _w-1 && j == _h - 1) ? ("" + _wallsMap[i][j]) : ("" + _wallsMap[i][j] + ", ");
+					if (i != _w - 1 && j != _h - 1)
+					{
+						floorMapCSV += "" + _floorMap[i][j] + ", ";
+						
+						if (_wallMap[i][j] != -1) // MAKE THIS LESS SHITTY
+						{
+							wallMapCSV += "" + _wallMap[i][j] + ", ";
+							transWallMapCSV += "0, ";
+						}
+						else
+						{
+							wallMapCSV += "0, ";
+							transWallMapCSV += "" + _wallMap[i][j] + ", ";
+						}
+						
+						lightingMapCSV += "0, ";
+						floorShadowsMapCSV += "0, ";
+					}
+					else
+					{
+						floorMapCSV += "" + _floorMap[i][j];
+						
+						if (_wallMap[i][j] != -1) // MAKE THIS LESS SHITTY
+						{
+							wallMapCSV += "" + _wallMap[i][j];
+							transWallMapCSV += "0";
+						}
+						else
+						{
+							wallMapCSV += "0";
+							transWallMapCSV += "" + _wallMap[i][j];
+						}
+						
+						lightingMapCSV += "0";
+						floorShadowsMapCSV += "0";
+					}
 				}
 				
 				floorMapCSV += "\n";
-				wallsMapCSV += "\n";
+				wallMapCSV += "\n";
+				transWallMapCSV += "\n";
+				lightingMapCSV += "\n";
+				floorShadowsMapCSV += "\n";
 			}
 			
-			// Finally, create a room that has everything our map does!
-			var room :Room = new Room();
-			room.floorMap.loadMap(floorMapCSV, _tileSet, 32, 32);
-			room.wallsMap.loadMap(wallsMapCSV, _tileSet, 32, 32);
-			
-			return room;
+			// Finally, reload the current room's tilemaps to use these values.
+			ResourceManager.playState.floorMap.loadMap(floorMapCSV, _tileSet, 32, 32);
+			ResourceManager.playState.floorShadowsMap.loadMap(floorShadowsMapCSV, _tileSet, 32, 32);
+			ResourceManager.playState.wallMap.loadMap(wallMapCSV, _tileSet, 32, 32);
+			ResourceManager.playState.transWallMap.loadMap(transWallMapCSV, ResourceManager.GFX_ENEMY1, 32, 32);
+			ResourceManager.playState.lightingMap.loadMap(lightingMapCSV, ResourceManager.GFX_LIGHTING_TILES, 32, 32);
 		}
 		
 		
@@ -327,14 +377,14 @@
 				if (upTwiceTile == WALL)
 				{
 					// This tiles above this one are guaranteed WALLs, so we know this tile's wallTop will be solid.
-					if (leftTile != WALL && rightTile != WALL && downTile != WALL) _wallsMap[X][Y - i - 2] = _b_thinwall_top;
-					else if (leftTile == WALL && rightTile != WALL && downTile != WALL) _wallsMap[X][Y - i - 2] = _br_wall_top;
-					else if (leftTile != WALL && rightTile == WALL && downTile != WALL) _wallsMap[X][Y - i - 2] = _bl_wall_top;
-					else if (leftTile != WALL && rightTile != WALL && downTile == WALL) _wallsMap[X][Y - i - 2] = _vert_thinwall_top;
-					else if (leftTile == WALL && rightTile == WALL && downTile != WALL) _wallsMap[X][Y - i - 2] = _b_wall_top;
-					else if (leftTile != WALL && rightTile == WALL && downTile == WALL) _wallsMap[X][Y - i - 2] = _l_wall_top;
-					else if (leftTile == WALL && rightTile != WALL && downTile == WALL) _wallsMap[X][Y - i - 2] = _r_wall_top;
-					else _wallsMap[X][Y - i - 2] = _c_wall_top;
+					if (leftTile != WALL && rightTile != WALL && downTile != WALL) _wallMap[X][Y - i - 2] = _b_thinwall_top;
+					else if (leftTile == WALL && rightTile != WALL && downTile != WALL) _wallMap[X][Y - i - 2] = _br_wall_top;
+					else if (leftTile != WALL && rightTile == WALL && downTile != WALL) _wallMap[X][Y - i - 2] = _bl_wall_top;
+					else if (leftTile != WALL && rightTile != WALL && downTile == WALL) _wallMap[X][Y - i - 2] = _vert_thinwall_top;
+					else if (leftTile == WALL && rightTile == WALL && downTile != WALL) _wallMap[X][Y - i - 2] = _b_wall_top;
+					else if (leftTile != WALL && rightTile == WALL && downTile == WALL) _wallMap[X][Y - i - 2] = _l_wall_top;
+					else if (leftTile == WALL && rightTile != WALL && downTile == WALL) _wallMap[X][Y - i - 2] = _r_wall_top;
+					else _wallMap[X][Y - i - 2] = _c_wall_top;
 					
 					i++;
 					continue;
@@ -349,14 +399,14 @@
 					// There's no wall 2 blocks up, so this WALL and the one above's tops need to be transparent (which is
 					// for the wallMap 2 and 3 spots above this level tile).
 					// Wall top for this WALL on level.
-					if (leftTile != WALL && rightTile != WALL && downTile != WALL) _wallsMap[X][Y - i - 2] = _b_thinwall_top_trans;
-					else if (leftTile == WALL && rightTile != WALL && downTile != WALL) _wallsMap[X][Y - i - 2] = _br_wall_top_trans;
-					else if (leftTile != WALL && rightTile == WALL && downTile != WALL) _wallsMap[X][Y - i - 2] = _bl_wall_top_trans;
-					else if (leftTile != WALL && rightTile != WALL && downTile == WALL) _wallsMap[X][Y - i - 2] = _vert_thinwall_top_trans;
-					else if (leftTile == WALL && rightTile == WALL && downTile != WALL) _wallsMap[X][Y - i - 2] = _b_wall_top_trans;
-					else if (leftTile != WALL && rightTile == WALL && downTile == WALL) _wallsMap[X][Y - i - 2] = _l_wall_top_trans;
-					else if (leftTile == WALL && rightTile != WALL && downTile == WALL) _wallsMap[X][Y - i - 2] = _r_wall_top_trans;
-					else _wallsMap[X][Y - i - 2] = _c_wall_top_trans;
+					if (leftTile != WALL && rightTile != WALL && downTile != WALL) _wallMap[X][Y - i - 2] = _b_thinwall_top_trans;
+					else if (leftTile == WALL && rightTile != WALL && downTile != WALL) _wallMap[X][Y - i - 2] = _br_wall_top_trans;
+					else if (leftTile != WALL && rightTile == WALL && downTile != WALL) _wallMap[X][Y - i - 2] = _bl_wall_top_trans;
+					else if (leftTile != WALL && rightTile != WALL && downTile == WALL) _wallMap[X][Y - i - 2] = _vert_thinwall_top_trans;
+					else if (leftTile == WALL && rightTile == WALL && downTile != WALL) _wallMap[X][Y - i - 2] = _b_wall_top_trans;
+					else if (leftTile != WALL && rightTile == WALL && downTile == WALL) _wallMap[X][Y - i - 2] = _l_wall_top_trans;
+					else if (leftTile == WALL && rightTile != WALL && downTile == WALL) _wallMap[X][Y - i - 2] = _r_wall_top_trans;
+					else _wallMap[X][Y - i - 2] = _c_wall_top_trans;
 					
 					// Update L and R since we're moving up one (don't need U or D - U is not a wall and D is definitely a wall).
 					leftTile = (X != 0) ? (_level[X-1][Y-i-1]) : (WALL); // Set the ones offscreen to WALL for convenience
@@ -365,10 +415,10 @@
 					// Wall top for the WALL above on level
 					if (Y - i - 3 < 0) break; // in case this is off the top.
 					
-					if (leftTile != WALL && rightTile != WALL) _wallsMap[X][Y - i - 3] = _u_thinwall_top_trans;
-					else if (leftTile == WALL && rightTile != WALL) _wallsMap[X][Y - i - 3] = _ur_wall_top_trans;
-					else if (leftTile != WALL && rightTile == WALL) _wallsMap[X][Y - i - 3] = _ul_wall_top_trans;
-					else _wallsMap[X][Y - i - 3] = _c_thinwall_top_trans;
+					if (leftTile != WALL && rightTile != WALL) _wallMap[X][Y - i - 3] = _u_thinwall_top_trans;
+					else if (leftTile == WALL && rightTile != WALL) _wallMap[X][Y - i - 3] = _ur_wall_top_trans;
+					else if (leftTile != WALL && rightTile == WALL) _wallMap[X][Y - i - 3] = _ul_wall_top_trans;
+					else _wallMap[X][Y - i - 3] = _c_thinwall_top_trans;
 					
 					break;
 				}
@@ -583,6 +633,8 @@
 					_b_thinwall_side = int(tokens[i + 1]);
 					continue;
 				}
+				
+				// Transparent wall sides and tops (NOTE: later the program will do this).
 			}
 			
 			// Warning messages if something didn't get set right.

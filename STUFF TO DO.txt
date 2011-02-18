@@ -1,0 +1,18 @@
+The following things need to get done at some point. The ones marked with a + should probably get done sooner:
+
+- Grab/make an animated FlxTilemap class so that cai's wall torches can flicker, water can animte, etc.
+- Implement tile variations for the auto-tiling.
+- Make a tilemap layer in rooms devoted to floor shadows (this will cut filsize and stress on the artists WAY down).
++ Implement some kind of "lighting" tilemap for darkening unexplored areas.
+- Fix Ace's level generator so that it sucks less.
+- Add in morganq's level generator.
+- Make the ChunkGenerator actually do something.
++ Add stairs, chests, loot, barrels, traps, etc. to generated levels.
++ Implement enemies and everything related to them.
++ Implement the basics of some kind of combat system.
+- Make the dungeon layout generator a bit more interesting, with multiple stairs that go into the same room and branching stair paths (possibly that meet up later in the same room?)
+--- Make Server keep track of # games played and overall skill stats for a certain account/guest's IPfor matchmaking purposes (noob, novice, totally familiar)
+--- Lists of permanent map changes (destroyed walls/destroyed barrels, etc.) (recorded whenever they are sent by server)
+
+
+

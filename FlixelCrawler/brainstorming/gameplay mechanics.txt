@@ -1,0 +1,30 @@
+--------------------------------------------------------------
+| This text file is for dumping ideas for gameplay mechanics |
+| that could be fun. Please contribute!                      |
+--------------------------------------------------------------
+
+pickup/throw barrels
+- rolling barrels will explode if shot by an arrow
+
+pickup/throw people
+- awesome
+
+jumping
+
+dash
+- long distance, drains mp
+- do an attack out of it for special attack
+- short distance, evasive (roll/dodge)
+
+drag racing
+- with dash LOL
+
+co-op attacks
+- either grab, or go beserk, or both (grab, then berserk)
+
+friendly fire
+- attack enemies, be careful not to attack allies
+- heall allie, be careful not to heal enemies
+
+beserk mode
+- kill fast enough and you'll start glowing

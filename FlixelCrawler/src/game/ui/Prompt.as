@@ -29,8 +29,8 @@ package game.ui
 			_prompt = new FlxText(X + 2, Y + 2, 196, text, true);
 			_prompt.alignment = "center";
 			
-			_name = new FlxInputText(X + 2, Y + 15, 196, 20, "name", 0xFFFFFF, null, 10, "center");
-			_name.filterMode = FlxInputText.ONLY_ALPHANUMERIC
+			_name = new FlxInputText(X + 2, Y + 15, 196, 20, "name", 0xFFFFFF, null, 10, "center", 0, confirm);
+			_name.filterMode = FlxInputText.ONLY_ALPHANUMERIC;
 			_name.setMaxLength(13);
 			_name.backgroundColor = 0x222222;
 			_name.alignment = "center";

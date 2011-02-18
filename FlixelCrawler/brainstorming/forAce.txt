@@ -1,6 +1,6 @@
 Programming guide:
 - Try to plan as much out as possible ahead of time
-- Take breaks every 30 mins (important!)
+- Take breaks every hour or so (important!)
 - 
 
 
@@ -32,47 +32,3 @@ X
 XXXXXXXX
 
 3 doors
-
-
-
-
-
-
-
-XXXXXXXXXX
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-X
-XXXXXXXXXX
-
-Priorities:
-- Merge, fix conflicts, and push something up.
-- Finish the auto-tiling
-- Make BasicGenerator better by adding multiple door possibilities for each room
-- Make ChunkGenerator actually work
-- Try to implement some simple lighting stuff.
-- Make mini chunks placeable by BasicGenerator (they may need to be rotated)
-- Try to fix render order for Room.
-- Make BasicGenerator better by allowing rooms to be connect by corridors? maybe these corridors can also have room offshoots?
-
-HEY
-since there is a distinction between full level prefabs and small chunk prefabs, you DON'T need to put chunks in LevelGenerator.
-

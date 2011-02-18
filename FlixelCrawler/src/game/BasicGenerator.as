@@ -6,11 +6,10 @@
 	
 	
 	// TODO: - Find out why the whole thing used to freeze up before the iterations bandage, and see if we can fix it.
-	//       - Make the adjacent rooms allow for multiple doors per wall instead of just the center. This will make maps a LOT (ALOT) more interesting.
-	//       - Put actual wooden doors in some passages, or maybe just if they're 2 wide (mix of passages and doors!)
-	//       - Implement auto-tiling over in LevelGenerator (important!)
-	//       - Implement prefabs, possibly non-square rooms?
+	//       - Make the adjacent rooms allow for multiple doors per wall instead of just the center. This will make maps a LOT (ALOT) more interesting!
 	//       - Add stairs to generated levels.
+	//       - Implement prefabs, possibly non-rectangular rooms?
+	//       - Put actual wooden doors in some passages, or maybe just if they're 2 wide (mix of passages and doors!)
 	
 	// The BasicGenerator level generator creates levels by starting with one room in the center
 	// and then building new rooms outward from its walls. 
@@ -23,7 +22,7 @@
 		
 		
 		// Generates a basic level made up of random chunks.
-		public static function generate(RandomSeed :int = NaN, TileSet :Class = null) :Room
+		public static function generate(RandomSeed :int = NaN, TileSet :Class = null) :void
 		{
 			FlxU.randomSeed = RandomSeed;
 			if (TileSet == null) _tileSet = ResourceManager.GFX_DUNGEON_TILES;
@@ -181,8 +180,40 @@
 				cc++;
 			}
 			
-			// Create and load up the room.
-			return convertToRoom();
+			var stairsX :int = 0, stairsY :int = 0;
+			var curStairs :Stairs;
+			// TESTING: Put in dumb stairs
+			// The up ones
+			if (ResourceManager.playState.curRoom.roomsAbove[0] != null || ResourceManager.playState.curRoom.depth == 0)
+			{
+				while (_level[stairsX][stairsY] != GROUND)
+				{
+					stairsX = int(FlxU.random() * _w);
+					stairsY = int(FlxU.random() * _h);
+				}
+				curStairs = new Stairs(stairsX * 32, stairsY * 32, ResourceManager.playState.curRoom.roomsAbove[0]);
+				ResourceManager.playState.stairsUp.add(curStairs);
+				ResourceManager.playState.stairsUp.add(curStairs.actionTooltip);
+				stairsX = 0;
+				stairsY = 0;
+			}
+			
+			// The down ones.
+			if (ResourceManager.playState.curRoom.roomsBelow[0] != null)
+			{
+				while (_level[stairsX][stairsY] != GROUND)
+				{
+					stairsX = int(FlxU.random() * _w);
+					stairsY = int(FlxU.random() * _h);
+				}
+				curStairs = new Stairs(stairsX * 32, stairsY * 32, ResourceManager.playState.curRoom.roomsBelow[0]);
+				ResourceManager.playState.stairsDown.add(curStairs);
+				ResourceManager.playState.stairsDown.add(curStairs.actionTooltip);
+				FlxG.log("");
+			}
+			
+			// Load up the room!
+			loadTilemaps();
 		}
 		
 		

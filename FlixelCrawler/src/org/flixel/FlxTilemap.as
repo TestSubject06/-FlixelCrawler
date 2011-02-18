@@ -132,6 +132,7 @@ package org.flixel
 			var cols:Array;
 			var rows:Array = MapData.split("\n");
 			heightInTiles = rows.length;
+			widthInTiles = 0;
 			_data = new Array();
 			var r:uint = 0;
 			var c:uint;
